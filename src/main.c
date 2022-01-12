@@ -198,7 +198,7 @@ void decode(FILE* input_file, FILE* output_file) {
   root[tree_size] = '\0';
   //create huffman tree from string form
   hnode_t *htree = hstr_gettree(root);
-  
+ 
   //read null terminated file size in string form
   char str_file_size[16];
   unsigned long file_size;
@@ -229,6 +229,7 @@ void decode(FILE* input_file, FILE* output_file) {
       if (n->type == LEAF) {
 	w = n->leaf.character;
 	if (file_size == 0) {
+	  ht_free(htree);
 	  q_free(q);
 	  return;
 	}
@@ -238,6 +239,7 @@ void decode(FILE* input_file, FILE* output_file) {
       }
     }
   }
+  
   ht_free(htree);
   q_free(q);
 }
@@ -260,6 +262,7 @@ void compress(char* filename) {
 
   //get huffman tree from the minheap
   hnode_t *htree = mhtoht(minheap);
+  mh_free(minheap);
 
   //get codes and string form of huffman tree
   char *hstr = ht_getstr(htree, HUFF_STR_SEP);
@@ -273,6 +276,7 @@ void compress(char* filename) {
       printf("Could not write the compressed file.\n");
       return;
   }
+  free(compressed_filename);
   
   //encode the file
   encode(inputfile, file_size, outputfile, charmap, hstr);

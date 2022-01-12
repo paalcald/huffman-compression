@@ -82,7 +82,5 @@ void mh_print(minheap_t *heap) {
 }
 
 void mh_free(minheap_t *heap) {
-	for (int i = 0; i < MINHEAP_MAX_SIZE; i++) {
-		ht_free(heap->tree[i]);
-	}
+  free(heap);
 }
