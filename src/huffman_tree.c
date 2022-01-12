@@ -108,3 +108,43 @@ void ht_free(hnode_t *root) {
     free(root);
   }
 }
+
+void _hstr_getleftsubtree(char *str, hnode_t *root) {
+  char *c = hstr_left(str);
+  hnode_t * newnode = (hnode_t *) malloc(sizeof(hnode_t));
+  root->node.left_tree = newnode;
+  if (*c != HUFF_STR_SEP) {
+    newnode->type = LEAF;
+    newnode->leaf.character = *c;
+  } else {
+    newnode->type = NODE;
+    _hstr_getleftsubtree(c, newnode);
+    _hstr_getrightsubtree(c, newnode);
+  }
+}
+void _hstr_getrightsubtree(char *str, hnode_t *root) {
+  char *c = hstr_right(str);
+  hnode_t * newnode = (hnode_t *) malloc(sizeof(hnode_t));
+  root->node.right_tree = newnode;
+  if (*c != HUFF_STR_SEP) {
+    newnode->type = LEAF;
+    newnode->leaf.character = *c;
+  } else {
+    newnode->type = NODE;
+    _hstr_getleftsubtree(c, newnode);
+    _hstr_getrightsubtree(c, newnode);
+  }
+}
+
+hnode_t *hstr_gettree(char *str) {
+  hnode_t * node = (hnode_t *) malloc(sizeof(hnode_t));
+  if (*str != HUFF_STR_SEP) {
+    node->type = LEAF;
+    node->leaf.character = *str;
+  } else {
+    node->type = NODE;
+    _hstr_getleftsubtree(str, node);
+    _hstr_getrightsubtree(str, node);
+  }
+  return node;
+}

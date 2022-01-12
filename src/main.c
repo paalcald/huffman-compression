@@ -196,6 +196,9 @@ void decode(FILE* input_file, FILE* output_file) {
     root[j] = c;
   }
   root[tree_size] = '\0';
+  //create huffman tree from string form
+  hnode_t *htree = hstr_gettree(root);
+  
   //read null terminated file size in string form
   char str_file_size[16];
   unsigned long file_size;
@@ -210,7 +213,7 @@ void decode(FILE* input_file, FILE* output_file) {
   //decode file
   char w;
   bool bit;
-  char *n = root;
+  hnode_t *n = htree;
   queue_t *q = q_create();
 
   while((c = fgetc(input_file)) != EOF) {
@@ -218,23 +221,24 @@ void decode(FILE* input_file, FILE* output_file) {
     while (q->size > 0) {
       bit = q_dequeue(q);
       if (bit == 0) {
-	n = hstr_left(n);
+	n = n->node.left_tree;
       }
       if (bit == 1) {
-	n = hstr_right(n);
+	n = n->node.right_tree;
       }
-      if (*n != HUFF_STR_SEP) {
-	w = *n;
+      if (n->type == LEAF) {
+	w = n->leaf.character;
 	if (file_size == 0) {
 	  q_free(q);
 	  return;
 	}
 	fputc(w, output_file);
-	n = root;
+	n = htree;
 	file_size--;
       }
     }
   }
+  ht_free(htree);
   q_free(q);
 }
 
@@ -344,12 +348,14 @@ int main(int argc, char** argv) {
       print_default_help();
     }
     if (input == 1) {
-      printf("Compressing %s\n", argv[2]);
+      printf("Compressing %s ...", argv[2]);
       compress(argv[2]);
+      printf(" done!\n");
     }
     if (input == 2) {
-      printf("Extracting %s\n", argv[2]);
+      printf("Extracting %s ...", argv[2]);
       decompress(argv[2]);
+      printf(" done!\n");
     }
     if (input == 3) {
       printf("huff: You must specift one of the '-c' compress or '-x' extract options.\n");
