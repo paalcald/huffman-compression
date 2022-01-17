@@ -76,6 +76,16 @@ char* ht_getstr(hnode_t *root, char c) {
   return str;
 }
 
+void ht_free(hnode_t *root) {
+  if (ht_isleaf(root)) {
+    free(root);
+  } else {
+    ht_free(root->node.left_tree);
+    ht_free(root->node.right_tree);
+    free(root);
+  }
+}
+
 char *hstr_next(char* c) {
   return c + 1;
 }
@@ -99,52 +109,26 @@ char *hstr_right(char* node) {
   return n;
 }
 
-void ht_free(hnode_t *root) {
-  if (ht_isleaf(root)) {
-    free(root);
+void _hstrtohtree(char **str, hnode_t *root) {
+  char c = **str;
+  (*str)++;
+  if (**str == HUFF_STR_SEP) {
+    root->type = NODE;
+    hnode_t *left_node = (hnode_t*) malloc(sizeof(hnode_t));
+    hnode_t *right_node = (hnode_t*) malloc(sizeof(hnode_t));
+    root->node.left_tree = left_node;
+    root->node.right_tree = right_node;
+    _hstrtohtree(str, left_node);
+    _hstrtohtree(str, right_node);
   } else {
-    ht_free(root->node.left_tree);
-    ht_free(root->node.right_tree);
-    free(root);
+    root->type = LEAF;
+    root->leaf.character = c;
   }
 }
 
-void _hstr_getleftsubtree(char *str, hnode_t *root) {
-  char *c = hstr_left(str);
-  hnode_t * newnode = (hnode_t *) malloc(sizeof(hnode_t));
-  root->node.left_tree = newnode;
-  if (*c != HUFF_STR_SEP) {
-    newnode->type = LEAF;
-    newnode->leaf.character = *c;
-  } else {
-    newnode->type = NODE;
-    _hstr_getleftsubtree(c, newnode);
-    _hstr_getrightsubtree(c, newnode);
-  }
-}
-void _hstr_getrightsubtree(char *str, hnode_t *root) {
-  char *c = hstr_right(str);
-  hnode_t * newnode = (hnode_t *) malloc(sizeof(hnode_t));
-  root->node.right_tree = newnode;
-  if (*c != HUFF_STR_SEP) {
-    newnode->type = LEAF;
-    newnode->leaf.character = *c;
-  } else {
-    newnode->type = NODE;
-    _hstr_getleftsubtree(c, newnode);
-    _hstr_getrightsubtree(c, newnode);
-  }
-}
-
-hnode_t *hstr_gettree(char *str) {
-  hnode_t * node = (hnode_t *) malloc(sizeof(hnode_t));
-  if (*str != HUFF_STR_SEP) {
-    node->type = LEAF;
-    node->leaf.character = *str;
-  } else {
-    node->type = NODE;
-    _hstr_getleftsubtree(str, node);
-    _hstr_getrightsubtree(str, node);
-  }
+hnode_t *hstrtohtree(char *str) {
+  hnode_t *node = (hnode_t *) malloc(sizeof(hnode_t));
+  _hstrtohtree(&str, node);
+  
   return node;
 }

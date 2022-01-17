@@ -43,5 +43,6 @@ char *hstr_right(char* node);
 hnode_t *hstr_gettree(char* str);
 void _hstr_getleftsubtree(char *str, hnode_t *root);
 void _hstr_getrightsubtree(char *str, hnode_t *root);
+hnode_t *hstrtohtree(char *str);
 
 #endif //HUFFMAN_TREE_H

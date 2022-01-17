@@ -10,6 +10,8 @@ HDRS = $(wildcard $(SRC)/*.h)
 OBJS = $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
 BIN = huff
 
+RELEASE_NAME = paalcald-huffman-compression.tar.gz
+
 all: $(BIN)
 
 $(BIN): $(OBJS)
@@ -29,3 +31,6 @@ $(OBJ)/%.o: $(SRC)/%.c $(SRC)/%.h
 
 clean:
 	rm $(OBJ)/* $(BIN)
+
+release: $(SRCS) $(HDRS) $(OBJ)
+	tar -zcvf $(RELEASE_NAME) $^

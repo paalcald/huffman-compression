@@ -197,7 +197,7 @@ void decode(FILE* input_file, FILE* output_file) {
   }
   root[tree_size] = '\0';
   //create huffman tree from string form
-  hnode_t *htree = hstr_gettree(root);
+  hnode_t *htree = hstrtohtree(root);
  
   //read null terminated file size in string form
   char str_file_size[16];
@@ -241,6 +241,7 @@ void decode(FILE* input_file, FILE* output_file) {
   }
   
   ht_free(htree);
+
   q_free(q);
 }
 
